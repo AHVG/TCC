@@ -19,6 +19,7 @@ import ConfigPanel from "./components/ConfigPanel";
 export default function App() {
     const [isDark, setIsDark] = useState<boolean>(true);
     const [machine, setMachine] = useState<string>("finite");
+    const [simulate, setSimulate] = useState<((inputString: string) => Promise<boolean>) | null>(null);
 
     const activeTool = useRef<string>("select");
 
@@ -84,7 +85,7 @@ export default function App() {
                         switch (machine) {
                             case "finite":
                                 return (
-                                    <FiniteAutomaton activeTool={activeTool} />
+                                    <FiniteAutomaton activeTool={activeTool} setSimulate={setSimulate} />
                                 );
                             case "stack":
                                 return (
@@ -99,7 +100,7 @@ export default function App() {
                         }
                     })()}
 
-                    <ConfigPanel />
+                    <ConfigPanel simulate={simulate} />
                 </Box>
             </Box>
         </ThemeProvider>

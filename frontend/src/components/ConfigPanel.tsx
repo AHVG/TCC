@@ -1,7 +1,29 @@
-import { useEffect, useRef } from "react";
-import { Box, Typography, Card, Divider, TextField } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import {
+    Box,
+    Typography,
+    Card,
+    Divider,
+    TextField,
+    Button,
+    Alert,
+} from "@mui/material";
 
-export default function ConfigPanel() {
+interface ConfigPanelProps {
+    simulate: ((inputString: string) => Promise<boolean>) | null;
+}
+
+export default function ConfigPanel({ simulate }: ConfigPanelProps) {
+    const [result, setResult] = useState<boolean | null>(null);
+    const [inputString, setInputString] = useState<string>("");
+
+    const handleSimulate = async () => {
+        if (simulate !== null) {
+            const r = await simulate(inputString);
+            setResult(r);
+        }
+    };
+
     return (
         <Card
             elevation={0}
@@ -25,10 +47,31 @@ export default function ConfigPanel() {
                     Simple Input
                 </Typography>
 
-                <TextField
-                    id="outlined-required"
-                    label="abbaab"
-                />
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: 2,
+                        mb: "10px",
+                    }}
+                >
+                    <TextField
+                        id="outlined-required"
+                        label="abbaab"
+                        value={inputString}
+                        onChange={(e) => setInputString(e.target.value)}
+                    />
+                    <Button variant="contained" onClick={handleSimulate}>
+                        Simulate
+                    </Button>
+                </Box>
+
+                {result !== null && (
+                    <Alert variant="filled" severity={result ? "success" : "error"}>
+                        {result ? "Accepted" : "Rejected"}
+                    </Alert>
+                )}
 
             </Box>
         </Card>

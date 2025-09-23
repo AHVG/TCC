@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { NodeSingular, Core } from "cytoscape";
 import {
@@ -14,9 +14,10 @@ import Canva from "./Canva";
 
 interface FiniteAutomatonProps {
     activeTool: RefObject<string>;
+    setSimulate: (simulate: (inputString: string) => Promise<boolean>) => void;
 }
 
-export default function FiniteAutomaton({ activeTool }: FiniteAutomatonProps) {
+export default function FiniteAutomaton({ activeTool, setSimulate }: FiniteAutomatonProps) {
     const BACKEND_URL = "http://localhost:8000";
 
     const cy = useRef<Core | null>(null);
@@ -153,48 +154,54 @@ export default function FiniteAutomaton({ activeTool }: FiniteAutomatonProps) {
         setOpenDialog(false);
     };
 
-    // const handleSimulate = async () => {
-    //     console.log("Simulando...");
-    //     const core = cy.current;
-    //     if (!core) return;
+    const handleSimulate = async (inputString: string) => {
+        console.log("Simulando...");
+        const core = cy.current;
+        if (!core) return;
 
-    //     const states = core.nodes().map((n) => n.data("id"));
-    //     const transitions = core.edges().map((e) => ({
-    //         source: e.data("source"),
-    //         target: e.data("target"),
-    //         symbol: e.data("label"),
-    //     }));
-    //     const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
-    //     if (initialNodes.length !== 1) {
-    //         alert("There must be exactly one initial state.");
-    //         return;
-    //     }
-    //     const finals = core
-    //         .nodes()
-    //         .filter((n) => n.data("isFinal"))
-    //         .map((n) => n.data("id"));
+        const states = core.nodes().map((n) => n.data("id"));
+        const transitions = core.edges().map((e) => ({
+            source: e.data("source"),
+            target: e.data("target"),
+            symbol: e.data("label"),
+        }));
+        const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
+        if (initialNodes.length !== 1) {
+            alert("There must be exactly one initial state.");
+            return;
+        }
+        const finals = core
+            .nodes()
+            .filter((n) => n.data("isFinal"))
+            .map((n) => n.data("id"));
 
-    //     try {
-    //         const response = await fetch(`${BACKEND_URL}/simulate`, {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({
-    //                 automaton: {
-    //                     states,
-    //                     transitions,
-    //                     initial: initialNodes[0].data("id"),
-    //                     finals,
-    //                 },
-    //                 input_string: inputString,
-    //             }),
-    //         });
-    //         const data = await response.json();
-    //         setSimulationResult(data.accepted);
-    //     } catch (err) {
-    //         console.error(err);
-    //         alert("Error simulating automaton.");
-    //     }
-    // };
+        try {
+            const response = await fetch(`${BACKEND_URL}/simulate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    automaton: {
+                        states,
+                        transitions,
+                        initial: initialNodes[0].data("id"),
+                        finals,
+                    },
+                    input_string: inputString,
+                }),
+            });
+            const data = await response.json();
+            return data.accepted;
+        } catch (err) {
+            console.error(err);
+            alert("Error simulating automaton.");
+        }
+
+        return false;
+    };
+
+    useEffect(() => {
+        setSimulate(() => handleSimulate);  // Parece que chama a função quando eu uso o setSimulate. BUG?
+    }, [setSimulate]);
 
     return (
         <>
