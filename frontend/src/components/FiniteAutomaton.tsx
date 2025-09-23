@@ -176,7 +176,7 @@ export default function FiniteAutomaton({ activeTool, setSimulate }: FiniteAutom
             .map((n) => n.data("id"));
 
         try {
-            const response = await fetch(`${BACKEND_URL}/simulate`, {
+            const response = await fetch(`${BACKEND_URL}/simulate/FA`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

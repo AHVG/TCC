@@ -11,7 +11,6 @@ import { darkTheme, lightTheme } from "./theme";
 
 import Header from "./components/Header";
 import Toolbar from "./components/Toolbar";
-// import Canva from "./components/Canva";
 import FiniteAutomaton from "./components/FiniteAutomaton";
 import StackAutomaton from "./components/StackAutomaton";
 import ConfigPanel from "./components/ConfigPanel";
@@ -89,7 +88,7 @@ export default function App() {
                                 );
                             case "stack":
                                 return (
-                                    <StackAutomaton activeTool={activeTool} />
+                                    <StackAutomaton activeTool={activeTool} setSimulate={setSimulate} />
                                 );
                             default:
                                 return (

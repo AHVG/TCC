@@ -1,13 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { NodeSingular, Core } from "cytoscape";
 import {
-    Box,
     Button,
-    Typography,
-    Divider,
     TextField,
-    Alert,
     Dialog,
     DialogActions,
     DialogContent,
@@ -18,10 +14,13 @@ import Canva from "./Canva";
 
 interface StackAutomatonProps {
     activeTool: RefObject<string>;
+    setSimulate: (simulate: (inputString: string) => Promise<boolean>) => void;
 }
 
-
-export default function StackAutomaton({ activeTool }: StackAutomatonProps) {
+export default function StackAutomaton({
+    activeTool,
+    setSimulate,
+}: StackAutomatonProps) {
     const BACKEND_URL = "http://localhost:8000";
 
     const cy = useRef<Core | null>(null);
@@ -114,10 +113,7 @@ export default function StackAutomaton({ activeTool }: StackAutomatonProps) {
     const handleConfirmTransition = () => {
         if (
             !selectedSource.current ||
-            !targetNode ||
-            !inputSymbol ||
-            !popSymbol ||
-            !pushSymbol
+            !targetNode
         ) {
             setOpenDialog(false);
             setInputSymbol("");
@@ -169,48 +165,60 @@ export default function StackAutomaton({ activeTool }: StackAutomatonProps) {
         setOpenDialog(false);
     };
 
-    // const handleSimulate = async () => {
-    //     console.log("Simulando...");
-    //     const core = cy.current;
-    //     if (!core) return;
+    const handleSimulate = async (inputString: string): Promise<boolean> => {
+        const core = cy.current;
+        if (!core) return false;
 
-    //     const states = core.nodes().map((n) => n.data("id"));
-    //     const transitions = core.edges().map((e) => ({
-    //         source: e.data("source"),
-    //         target: e.data("target"),
-    //         symbol: e.data("label"),
-    //     }));
-    //     const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
-    //     if (initialNodes.length !== 1) {
-    //         alert("There must be exactly one initial state.");
-    //         return;
-    //     }
-    //     const finals = core
-    //         .nodes()
-    //         .filter((n) => n.data("isFinal"))
-    //         .map((n) => n.data("id"));
+        const states = core.nodes().map((n) => n.data("id"));
+        const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
+        if (initialNodes.length !== 1) {
+            alert("There must be exactly one initial state.");
+            return false;
+        }
+        const finals = core
+            .nodes()
+            .filter((n) => n.data("isFinal"))
+            .map((n) => n.data("id"));
 
-    //     try {
-    //         const response = await fetch(`${BACKEND_URL}/simulate`, {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //             body: JSON.stringify({
-    //                 automaton: {
-    //                     states,
-    //                     transitions,
-    //                     initial: initialNodes[0].data("id"),
-    //                     finals,
-    //                 },
-    //                 input_string: inputString,
-    //             }),
-    //         });
-    //         const data = await response.json();
-    //         setSimulationResult(data.accepted);
-    //     } catch (err) {
-    //         console.error(err);
-    //         alert("Error simulating automaton.");
-    //     }
-    // };
+        // Transições estruturadas com input, pop e push
+        const transitions = core.edges().map((e) => {
+            const [input, popPush] = e.data("label").split(",");
+            const [pop, push] = popPush.split("->");
+            return {
+                source: e.data("source"),
+                target: e.data("target"),
+                symbol: input || "",
+                stack_pop: pop || "",
+                stack_push: push || "",
+            };
+        });
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/simulate/PDA`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    automaton: {
+                        states,
+                        transitions,
+                        initial: initialNodes[0].data("id"),
+                        finals,
+                    },
+                    input_string: inputString,
+                }),
+            });
+            const data = await response.json();
+            return data.accepted;
+        } catch (err) {
+            console.error(err);
+            alert("Error simulating automaton.");
+            return false;
+        }
+    };
+
+    useEffect(() => {
+        setSimulate(() => handleSimulate);
+    }, [setSimulate]);
 
     return (
         <>
