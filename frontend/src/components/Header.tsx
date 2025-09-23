@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Card, Tabs, Tab } from "@mui/material";
 
 interface HeaderProps {
-    activeMachine: string;
     onMachineChange: (tool: string) => void;
-}
+};
+
 
 const machines = [
     { label: "Finite Automaton", value: "finite" },
@@ -13,13 +13,13 @@ const machines = [
 ];
 
 export default function Header({
-    activeMachine,
     onMachineChange,
 }: HeaderProps) {
     const [value, setValue] = useState(0);
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
+        console.log(machines[newValue].value + newValue);
         onMachineChange(machines[newValue].value);
     };
 
@@ -36,16 +36,15 @@ export default function Header({
         >
             <Tabs
                 value={value}
-                disableRipple
                 onChange={handleChange}
                 variant="fullWidth"
                 slotProps={{ indicator: { style: { display: "none" } } }}
                 centered
             >
-                {machines.map((machine, index) => (
+                {machines.map((m, index) => (
                     <Tab
-                        key={machine.value}
-                        label={machine.label}
+                        key={m.value}
+                        label={m.label}
                         sx={{
                             bgcolor:
                                 value === index

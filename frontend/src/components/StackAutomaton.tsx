@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import type { RefObject } from "react";
 import type { NodeSingular, Core } from "cytoscape";
 import {
     Box,
@@ -15,7 +16,12 @@ import {
 
 import Canva from "./Canva";
 
-export default function StackAutomaton() {
+interface StackAutomatonProps {
+    activeTool: RefObject<string>;
+}
+
+
+export default function StackAutomaton({ activeTool }: StackAutomatonProps) {
     const BACKEND_URL = "http://localhost:8000";
 
     const cy = useRef<Core | null>(null);
@@ -27,31 +33,7 @@ export default function StackAutomaton() {
     const [pushSymbol, setPushSymbol] = useState("");
     const [targetNode, setTargetNode] = useState<NodeSingular | null>(null);
 
-    const [inputString, setInputString] = useState("");
-    const [simulationResult, setSimulationResult] = useState(null);
-    const [, setForceUpdate] = useState(0);
-    const forceRerender = () => setForceUpdate((n) => n + 1);
-
-    const createStateMode = useRef(false);
-    const transitionMode = useRef(false);
     const selectedSource = useRef<NodeSingular | null>(null);
-
-    const toggleCreateStateMode = () => {
-        createStateMode.current = !createStateMode.current;
-        transitionMode.current = false;
-        selectedSource.current = null;
-        forceRerender();
-    };
-
-    const toggleTransitionMode = () => {
-        if (selectedSource.current) {
-            selectedSource.current.style("border-width", "0px");
-        }
-        transitionMode.current = !transitionMode.current;
-        createStateMode.current = false;
-        selectedSource.current = null;
-        forceRerender();
-    };
 
     const onInit = (initCy: Core, initCyRef: HTMLDivElement) => {
         cy.current = initCy;
@@ -67,7 +49,7 @@ export default function StackAutomaton() {
         // Criar estado
         core.on("tap", (evt) => {
             console.log("Criando estado...");
-            if (evt.target === cy.current && createStateMode.current) {
+            if (evt.target === cy.current && activeTool.current === "state") {
                 const pos = evt.position;
                 const id = `q${core.nodes().length}`;
                 core.add({
@@ -87,7 +69,7 @@ export default function StackAutomaton() {
         // Criar transição
         core.on("tap", "node", (evt) => {
             console.log("Criando transição...");
-            if (transitionMode.current) {
+            if (activeTool.current === "transition") {
                 const node = evt.target;
                 if (!selectedSource.current) {
                     selectedSource.current = node;
@@ -130,7 +112,13 @@ export default function StackAutomaton() {
     };
 
     const handleConfirmTransition = () => {
-        if (!selectedSource.current || !targetNode || !inputSymbol || !popSymbol || !pushSymbol) {
+        if (
+            !selectedSource.current ||
+            !targetNode ||
+            !inputSymbol ||
+            !popSymbol ||
+            !pushSymbol
+        ) {
             setOpenDialog(false);
             setInputSymbol("");
             setPopSymbol("");
@@ -181,171 +169,89 @@ export default function StackAutomaton() {
         setOpenDialog(false);
     };
 
-    const handleSimulate = async () => {
-        console.log("Simulando...");
-        const core = cy.current;
-        if (!core) return;
+    // const handleSimulate = async () => {
+    //     console.log("Simulando...");
+    //     const core = cy.current;
+    //     if (!core) return;
 
-        const states = core.nodes().map((n) => n.data("id"));
-        const transitions = core.edges().map((e) => ({
-            source: e.data("source"),
-            target: e.data("target"),
-            symbol: e.data("label"),
-        }));
-        const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
-        if (initialNodes.length !== 1) {
-            alert("There must be exactly one initial state.");
-            return;
-        }
-        const finals = core
-            .nodes()
-            .filter((n) => n.data("isFinal"))
-            .map((n) => n.data("id"));
+    //     const states = core.nodes().map((n) => n.data("id"));
+    //     const transitions = core.edges().map((e) => ({
+    //         source: e.data("source"),
+    //         target: e.data("target"),
+    //         symbol: e.data("label"),
+    //     }));
+    //     const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
+    //     if (initialNodes.length !== 1) {
+    //         alert("There must be exactly one initial state.");
+    //         return;
+    //     }
+    //     const finals = core
+    //         .nodes()
+    //         .filter((n) => n.data("isFinal"))
+    //         .map((n) => n.data("id"));
 
-        try {
-            const response = await fetch(`${BACKEND_URL}/simulate`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    automaton: {
-                        states,
-                        transitions,
-                        initial: initialNodes[0].data("id"),
-                        finals,
-                    },
-                    input_string: inputString,
-                }),
-            });
-            const data = await response.json();
-            setSimulationResult(data.accepted);
-        } catch (err) {
-            console.error(err);
-            alert("Error simulating automaton.");
-        }
-    };
+    //     try {
+    //         const response = await fetch(`${BACKEND_URL}/simulate`, {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({
+    //                 automaton: {
+    //                     states,
+    //                     transitions,
+    //                     initial: initialNodes[0].data("id"),
+    //                     finals,
+    //                 },
+    //                 input_string: inputString,
+    //             }),
+    //         });
+    //         const data = await response.json();
+    //         setSimulationResult(data.accepted);
+    //     } catch (err) {
+    //         console.error(err);
+    //         alert("Error simulating automaton.");
+    //     }
+    // };
 
     return (
-        <Box sx={{ display: "flex", height: "100vh", width: "100vw" }}>
-            <Box
-                sx={{
-                    width: 280,
-                    bgcolor: "grey.100",
-                    display: "flex",
-                    flexDirection: "column",
-                    p: 2,
-                    borderRight: "1px solid #ddd",
-                }}
-            >
-                <Typography variant="h6" color="#666" gutterBottom>
-                    Tools
-                </Typography>
-
-                <Button
-                    variant={createStateMode.current ? "contained" : "outlined"}
-                    color={createStateMode.current ? "success" : "primary"}
-                    fullWidth
-                    sx={{ mb: 1 }}
-                    onClick={toggleCreateStateMode}
-                >
-                    {createStateMode.current
-                        ? "Click on canvas..."
-                        : "Create State"}
-                </Button>
-
-                <Button
-                    variant={transitionMode.current ? "contained" : "outlined"}
-                    color={transitionMode.current ? "error" : "primary"}
-                    fullWidth
-                    sx={{ mb: 2 }}
-                    onClick={toggleTransitionMode}
-                >
-                    {transitionMode.current
-                        ? "Transition Mode Active"
-                        : "Create Transition"}
-                </Button>
-
-                <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                    <DialogTitle>Enter PDA Transition</DialogTitle>
-                    <DialogContent>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            label="Input Symbol"
-                            fullWidth
-                            value={inputSymbol}
-                            onChange={(e) => setInputSymbol(e.target.value)}
-                        />
-                        <TextField
-                            margin="dense"
-                            label="Pop Symbol (stack top)"
-                            fullWidth
-                            value={popSymbol}
-                            onChange={(e) => setPopSymbol(e.target.value)}
-                        />
-                        <TextField
-                            margin="dense"
-                            label="Push Symbol(s)"
-                            fullWidth
-                            value={pushSymbol}
-                            onChange={(e) => setPushSymbol(e.target.value)}
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setOpenDialog(false)}>
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={handleConfirmTransition}
-                            variant="contained"
-                        >
-                            Confirm
-                        </Button>
-                    </DialogActions>
-                </Dialog>
-
-                <TextField
-                    label="Input String"
-                    value={inputString}
-                    onChange={(e) => setInputString(e.target.value)}
-                    fullWidth
-                    sx={{ mb: 1 }}
-                />
-
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    fullWidth
-                    onClick={handleSimulate}
-                >
-                    Simulate
-                </Button>
-
-                {simulationResult !== null && (
-                    <Alert
-                        severity={simulationResult ? "success" : "error"}
-                        sx={{ mt: 2 }}
+        <>
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <DialogTitle>Enter PDA Transition</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Input Symbol"
+                        fullWidth
+                        value={inputSymbol}
+                        onChange={(e) => setInputSymbol(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Pop Symbol (stack top)"
+                        fullWidth
+                        value={popSymbol}
+                        onChange={(e) => setPopSymbol(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Push Symbol(s)"
+                        fullWidth
+                        value={pushSymbol}
+                        onChange={(e) => setPushSymbol(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+                    <Button
+                        onClick={handleConfirmTransition}
+                        variant="contained"
                     >
-                        {simulationResult ? "Accepted ✅" : "Rejected ❌"}
-                    </Alert>
-                )}
-
-                <Divider sx={{ my: 2 }} />
-
-                <Typography variant="body2" color="#666">
-                    <b>Create State:</b> click the button and then on the
-                    canvas.
-                    <br />
-                    <b>Create Transition:</b> click the button, select source
-                    and target nodes, then enter the input, pop and push symbols.
-                    <br />
-                    <b>Right-click node:</b> cycles Initial → Final →
-                    Initial+Final → Normal.
-                    <br />
-                    <b>Simulation:</b> type input string and click Simulate.
-                </Typography>
-            </Box>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Canva onInit={onInit} />
-        </Box>
+        </>
     );
 }

@@ -1,17 +1,26 @@
-import { useState } from "react";
-import type { Core } from "cytoscape";
+import { useState, useRef } from "react";
 
-import { Box, Button, IconButton, ThemeProvider, CssBaseline, Icon } from "@mui/material";
+import {
+    Box,
+    IconButton,
+    ThemeProvider,
+    CssBaseline,
+    Icon,
+} from "@mui/material";
 import { darkTheme, lightTheme } from "./theme";
 
 import Header from "./components/Header";
 import Toolbar from "./components/Toolbar";
-import Canva from "./components/Canva";
-// import ConfigPanel from "./components/ConfigPanel"
+// import Canva from "./components/Canva";
+import FiniteAutomaton from "./components/FiniteAutomaton";
+import StackAutomaton from "./components/StackAutomaton";
+import ConfigPanel from "./components/ConfigPanel";
 
 export default function App() {
     const [isDark, setIsDark] = useState<boolean>(true);
-    const [activeTool, setActiveTool] = useState<string>("select");
+    const [machine, setMachine] = useState<string>("finite");
+
+    const activeTool = useRef<string>("select");
 
     return (
         <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
@@ -19,7 +28,7 @@ export default function App() {
             <Box
                 sx={{
                     height: "100vh",
-                    width: "100%", // deixa 100% do container pai, não do viewport
+                    width: "100%",
                     display: "flex",
                     flexDirection: "column",
                     p: "0px 150px",
@@ -32,10 +41,7 @@ export default function App() {
                         flexDirection: "row",
                     }}
                 >
-                    <Header
-                        activeMachine=""
-                        onMachineChange={(tool: string) => {}}
-                    />
+                    <Header onMachineChange={setMachine} />
                     <Box
                         sx={{
                             display: "flex",
@@ -72,16 +78,28 @@ export default function App() {
                         gap: 1,
                     }}
                 >
-                    <Toolbar
-                        activeTool={activeTool}
-                        onToolChange={setActiveTool}
-                    />
-                    <Canva
-                        onInit={(cy: Core, cyRef: HTMLDivElement) => {
-                            cy;
-                            cyRef;
-                        }}
-                    />
+                    <Toolbar activeTool={activeTool} />
+
+                    {(() => {
+                        switch (machine) {
+                            case "finite":
+                                return (
+                                    <FiniteAutomaton activeTool={activeTool} />
+                                );
+                            case "stack":
+                                return (
+                                    <StackAutomaton activeTool={activeTool} />
+                                );
+                            default:
+                                return (
+                                    <Box sx={{ color: "text.secondary", p: 2 }}>
+                                        Select an automaton
+                                    </Box>
+                                );
+                        }
+                    })()}
+
+                    <ConfigPanel />
                 </Box>
             </Box>
         </ThemeProvider>

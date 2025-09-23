@@ -71,7 +71,6 @@ export default function Canva({ onInit }: CanvaProps) {
         >
             <Box
                 sx={{
-                    flexGrow: 1,
                     width: "100%",
                     height: "100%",
                 }}
