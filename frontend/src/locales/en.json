@@ -1,0 +1,10 @@
+{
+    "finite_automaton": "Finite Automaton",
+    "stack_automaton": "Stack Automaton",
+    "input_symbol": "Input Symbol",
+    "pop_symbol": "Pop Symbol",
+    "push_symbol": "Push Symbol(s)",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
+  

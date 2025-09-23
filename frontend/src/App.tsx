@@ -14,6 +14,7 @@ import Toolbar from "./components/Toolbar";
 import FiniteAutomaton from "./components/FiniteAutomaton";
 import StackAutomaton from "./components/StackAutomaton";
 import ConfigPanel from "./components/ConfigPanel";
+import LanguageSelector from "./components/LanguageSelector";
 
 export default function App() {
     const [isDark, setIsDark] = useState<boolean>(true);
@@ -51,6 +52,8 @@ export default function App() {
                             alignItems: "center",
                         }}
                     >
+                        <LanguageSelector />
+
                         {/* talvez colocar no Header */}
                         <IconButton
                             size="small"

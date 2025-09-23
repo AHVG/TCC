@@ -1,0 +1,10 @@
+{
+    "finite_automaton": "Autômato Finito",
+    "stack_automaton": "Autômato de Pilha",
+    "input_symbol": "Símbolo de Entrada",
+    "pop_symbol": "Símbolo do Topo da Pilha",
+    "push_symbol": "Símbolo(s) a Empilhar",
+    "confirm": "Confirmar",
+    "cancel": "Cancelar"
+  }
+  
