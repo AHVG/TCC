@@ -23,7 +23,6 @@ export default function Toolbar({ activeTool }: ToolbarProps) {
         activeTool.current = tool;
     }, [tool]);
 
-
     return (
         <Card
             elevation={0}
@@ -44,28 +43,19 @@ export default function Toolbar({ activeTool }: ToolbarProps) {
             {tools.map((t) => (
                 <IconButton
                     key={t.name}
-                    onClick={() => (setTool(t.name))}
+                    onClick={() => setTool(t.name)}
                     sx={{
                         color:
-                            tool === t.name
-                                ? "primary.main"
-                                : "text.primary",
-                        bgcolor:
-                            tool === t.name
-                                ? "info.main"
-                                : "transparent",
+                            tool === t.name ? "primary.main" : "text.primary",
+                        bgcolor: tool === t.name ? "info.main" : "transparent",
                         "&:hover": {
                             bgcolor:
-                                tool === t.name
-                                    ? "info.light"
-                                    : "action.hover",
+                                tool === t.name ? "info.light" : "action.hover",
                         },
                         transition: "all 0.2s",
                     }}
                 >
-                    <Icon className="material-symbols-outlined">
-                        {t.icon}
-                    </Icon>
+                    <Icon className="material-symbols-outlined">{t.icon}</Icon>
                 </IconButton>
             ))}
         </Card>

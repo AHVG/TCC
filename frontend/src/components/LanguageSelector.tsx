@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Select, MenuItem, FormControl, InputLabel, Icon } from "@mui/material";
+import { Select, MenuItem, FormControl, Icon } from "@mui/material";
 
 export default function LanguageSelector() {
     const { i18n } = useTranslation();
@@ -16,8 +16,8 @@ export default function LanguageSelector() {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: .5,
-                width: "200px"
+                gap: 0.5,
+                width: "200px",
             }}
         >
             <Icon className="material-symbols-outlined">language</Icon>

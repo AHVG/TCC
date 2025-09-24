@@ -1,20 +1,20 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, Tabs, Tab } from "@mui/material";
 
 interface HeaderProps {
     onMachineChange: (tool: string) => void;
-};
-
+}
 
 const machines = [
-    { label: "Finite Automaton", value: "finite" },
-    { label: "Stack Automaton", value: "stack" },
-    { label: "Turing Machine", value: "turing" },
+    { key: "finite_automaton", value: "finite" },
+    { key: "stack_automaton", value: "stack" },
+    { key: "turing_machine", value: "turing" },
 ];
 
-export default function Header({
-    onMachineChange,
-}: HeaderProps) {
+export default function Header({ onMachineChange }: HeaderProps) {
+    const { t } = useTranslation();
+
     const [value, setValue] = useState(0);
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -44,7 +44,7 @@ export default function Header({
                 {machines.map((m, index) => (
                     <Tab
                         key={m.value}
-                        label={m.label}
+                        label={t(`${m.key}`)}
                         sx={{
                             bgcolor:
                                 value === index

@@ -1,10 +1,23 @@
 {
     "finite_automaton": "Finite Automaton",
     "stack_automaton": "Stack Automaton",
+    "turing_machine": "Turing Machine",
+
     "input_symbol": "Input Symbol",
     "pop_symbol": "Pop Symbol",
     "push_symbol": "Push Symbol(s)",
+    
+    "dialog_title": "Enter with a transition",
+    "one_initial_state": "There must be exactly one initial state.",
+    "simulation_error": "Error to simulate",
+
     "confirm": "Confirm",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+
+    "config_title": "Configuration",
+    "config_simple_input_title": "Simple input",
+    "config_simulate": "Simulate",
+    "config_accepted": "Accepted",
+    "config_rejected": "Rejected"
   }
   

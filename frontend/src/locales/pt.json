@@ -1,10 +1,22 @@
 {
     "finite_automaton": "Autômato Finito",
     "stack_automaton": "Autômato de Pilha",
+    "turing_machine": "Máquina de Turing",
+    
+    "dialog_title": "Entre com a transição",
     "input_symbol": "Símbolo de Entrada",
+    "one_initial_state": "Deve ter exatamente um estado incial.",
+    "simulation_error": "Erro ao simular",
+
     "pop_symbol": "Símbolo do Topo da Pilha",
     "push_symbol": "Símbolo(s) a Empilhar",
     "confirm": "Confirmar",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+
+    "config_title": "Configuração",
+    "config_simple_input_title": "Entrada simple",
+    "config_simulate": "Simular",
+    "config_accepted": "Aceitar",
+    "config_rejected": "Rejeitar" 
   }
   

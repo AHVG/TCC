@@ -19,7 +19,9 @@ import LanguageSelector from "./components/LanguageSelector";
 export default function App() {
     const [isDark, setIsDark] = useState<boolean>(true);
     const [machine, setMachine] = useState<string>("finite");
-    const [simulate, setSimulate] = useState<((inputString: string) => Promise<boolean>) | null>(null);
+    const [simulate, setSimulate] = useState<
+        ((inputString: string) => Promise<boolean>) | null
+    >(null);
 
     const activeTool = useRef<string>("select");
 
@@ -87,16 +89,22 @@ export default function App() {
                         switch (machine) {
                             case "finite":
                                 return (
-                                    <FiniteAutomaton activeTool={activeTool} setSimulate={setSimulate} />
+                                    <FiniteAutomaton
+                                        activeTool={activeTool}
+                                        setSimulate={setSimulate}
+                                    />
                                 );
                             case "stack":
                                 return (
-                                    <StackAutomaton activeTool={activeTool} setSimulate={setSimulate} />
+                                    <StackAutomaton
+                                        activeTool={activeTool}
+                                        setSimulate={setSimulate}
+                                    />
                                 );
                             default:
                                 return (
                                     <Box sx={{ color: "text.secondary", p: 2 }}>
-                                        Select an automaton
+                                        ...
                                     </Box>
                                 );
                         }

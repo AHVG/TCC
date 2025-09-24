@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
+import { useTranslation } from "react-i18next";
 import type { NodeSingular, Core } from "cytoscape";
 import {
     Button,
@@ -21,6 +22,8 @@ export default function StackAutomaton({
     activeTool,
     setSimulate,
 }: StackAutomatonProps) {
+    const { t } = useTranslation();
+
     const BACKEND_URL = "http://localhost:8000";
 
     const cy = useRef<Core | null>(null);
@@ -111,10 +114,7 @@ export default function StackAutomaton({
     };
 
     const handleConfirmTransition = () => {
-        if (
-            !selectedSource.current ||
-            !targetNode
-        ) {
+        if (!selectedSource.current || !targetNode) {
             setOpenDialog(false);
             setInputSymbol("");
             setPopSymbol("");
@@ -172,7 +172,7 @@ export default function StackAutomaton({
         const states = core.nodes().map((n) => n.data("id"));
         const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
         if (initialNodes.length !== 1) {
-            alert("There must be exactly one initial state.");
+            alert(t("one_initial_state"));
             return false;
         }
         const finals = core
@@ -211,7 +211,7 @@ export default function StackAutomaton({
             return data.accepted;
         } catch (err) {
             console.error(err);
-            alert("Error simulating automaton.");
+            alert(t("simulation_error"));
             return false;
         }
     };
@@ -223,38 +223,40 @@ export default function StackAutomaton({
     return (
         <>
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                <DialogTitle>Enter PDA Transition</DialogTitle>
+                <DialogTitle>{t("dialog_title")}</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Input Symbol"
+                        label={t("input_symbol")}
                         fullWidth
                         value={inputSymbol}
                         onChange={(e) => setInputSymbol(e.target.value)}
                     />
                     <TextField
                         margin="dense"
-                        label="Pop Symbol (stack top)"
+                        label={t("pop_symbol")}
                         fullWidth
                         value={popSymbol}
                         onChange={(e) => setPopSymbol(e.target.value)}
                     />
                     <TextField
                         margin="dense"
-                        label="Push Symbol(s)"
+                        label={t("push_symbol")}
                         fullWidth
                         value={pushSymbol}
                         onChange={(e) => setPushSymbol(e.target.value)}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+                    <Button onClick={() => setOpenDialog(false)}>
+                        {t("cancel")}
+                    </Button>
                     <Button
                         onClick={handleConfirmTransition}
                         variant="contained"
                     >
-                        Confirm
+                        {t("confirm")}
                     </Button>
                 </DialogActions>
             </Dialog>

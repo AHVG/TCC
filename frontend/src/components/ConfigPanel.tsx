@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
     Box,
     Typography,
@@ -14,6 +15,8 @@ interface ConfigPanelProps {
 }
 
 export default function ConfigPanel({ simulate }: ConfigPanelProps) {
+    const { t } = useTranslation();
+
     const [result, setResult] = useState<boolean | null>(null);
     const [inputString, setInputString] = useState<string>("");
 
@@ -38,13 +41,13 @@ export default function ConfigPanel({ simulate }: ConfigPanelProps) {
         >
             <Box sx={{ width: "100%" }}>
                 <Typography variant="h6" sx={{ p: "10px 5px 10px 5px" }}>
-                    Configuration
+                    {t("config_title")}
                 </Typography>
 
                 <Divider />
 
                 <Typography sx={{ p: "10px 5px 10px 5px" }}>
-                    Simple Input
+                    {t("config_simple_input_title")}
                 </Typography>
 
                 <Box
@@ -63,16 +66,18 @@ export default function ConfigPanel({ simulate }: ConfigPanelProps) {
                         onChange={(e) => setInputString(e.target.value)}
                     />
                     <Button variant="contained" onClick={handleSimulate}>
-                        Simulate
+                        {t("config_simulate")}
                     </Button>
                 </Box>
 
                 {result !== null && (
-                    <Alert variant="filled" severity={result ? "success" : "error"}>
-                        {result ? "Accepted" : "Rejected"}
+                    <Alert
+                        variant="filled"
+                        severity={result ? "success" : "error"}
+                    >
+                        {result ? t("config_accepted") : t("config_rejected")}
                     </Alert>
                 )}
-
             </Box>
         </Card>
     );

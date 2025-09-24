@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
+import { useTranslation } from "react-i18next";
 import type { NodeSingular, Core } from "cytoscape";
 import {
     Button,
@@ -17,7 +18,12 @@ interface FiniteAutomatonProps {
     setSimulate: (simulate: (inputString: string) => Promise<boolean>) => void;
 }
 
-export default function FiniteAutomaton({ activeTool, setSimulate }: FiniteAutomatonProps) {
+export default function FiniteAutomaton({
+    activeTool,
+    setSimulate,
+}: FiniteAutomatonProps) {
+    const { t } = useTranslation();
+
     const BACKEND_URL = "http://localhost:8000";
 
     const cy = useRef<Core | null>(null);
@@ -167,7 +173,7 @@ export default function FiniteAutomaton({ activeTool, setSimulate }: FiniteAutom
         }));
         const initialNodes = core.nodes().filter((n) => n.data("isInitial"));
         if (initialNodes.length !== 1) {
-            alert("There must be exactly one initial state.");
+            alert(t("one_initial_state"));
             return;
         }
         const finals = core
@@ -193,37 +199,39 @@ export default function FiniteAutomaton({ activeTool, setSimulate }: FiniteAutom
             return data.accepted;
         } catch (err) {
             console.error(err);
-            alert("Error simulating automaton.");
+            alert(t("simulation_error"));
         }
 
         return false;
     };
 
     useEffect(() => {
-        setSimulate(() => handleSimulate);  // Parece que chama a função quando eu uso o setSimulate. BUG?
+        setSimulate(() => handleSimulate); // Parece que chama a função quando eu uso o setSimulate. BUG?
     }, [setSimulate]);
 
     return (
         <>
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                <DialogTitle>Enter transition symbol</DialogTitle>
+                <DialogTitle>{t("dialog_title")}</DialogTitle>
                 <DialogContent>
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Symbol"
+                        label={t("input_symbol")}
                         fullWidth
                         value={transitionSymbol}
                         onChange={(e) => setTransitionSymbol(e.target.value)}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+                    <Button onClick={() => setOpenDialog(false)}>
+                        {t("cancel")}
+                    </Button>
                     <Button
                         onClick={handleConfirmTransition}
                         variant="contained"
                     >
-                        Confirm
+                        {t("confirm")}
                     </Button>
                 </DialogActions>
             </Dialog>
